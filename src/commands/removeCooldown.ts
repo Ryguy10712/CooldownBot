@@ -2,6 +2,7 @@ import {Command} from "../command";
 import {Bot} from "../main";
 import {CommandInteraction} from "discord.js";
 import {cooldownOutcome} from "../interfaces";
+import { RemoveCooldownSuccessEmbd } from "../components/CooldownResponses";
 
 export class RemoveCooldownCmd extends Command{
     public name = "remove_cooldown";
@@ -38,6 +39,6 @@ export class RemoveCooldownCmd extends Command{
             return;
         }
 
-        await i.reply({content: "The cooldown has been removed", ephemeral: true});
+        await i.reply({embeds: [new RemoveCooldownSuccessEmbd(user.id)], ephemeral: true});
     }
 }

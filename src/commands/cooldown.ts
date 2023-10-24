@@ -1,5 +1,5 @@
 import {Command} from "../command";
-import {CommandInteraction} from "discord.js";
+import {CommandInteraction, Guild, GuildMember} from "discord.js";
 import {cooldownInfo, cooldownOutcome} from "../interfaces";
 import {Bot} from "../main";
 import {CooldownReasonModal} from "../components/CooldownReasonModal";
@@ -49,14 +49,27 @@ export class CooldownCmd extends Command {
         const time = i.options.get("time", true).value as string
         const reason = i.options.get("reason", true);
 
-        //make sure user did not try to cooldown bot
+        //make sure user did not try to cooldown bot5
         if(user.bot){
             i.reply(`This idiot <@${i.user.id}> just tried to cooldown a bot 🤣🤣🤣`).then();
             return;
         }
         
-        //make sure user is admin
-        if(!bot.adminIds.includes(i.user.id)){
+        //make sure the user has admin roles
+        let roles;
+        try {
+            await i.guild?.roles.fetch(process.env.COOLDOWN_ROLE_ID!);
+            const member = await i.guild!.members.fetch(user.id);
+            roles = member.roles.cache
+        } catch (error) {
+            i.reply({"content": "An unexpected error occured", ephemeral: true})
+        }        
+        
+        const isAdmin = roles?.some(role => {
+            return bot.adminIds.includes(role.id);
+        })
+
+        if(!roles || !isAdmin){
             i.reply({embeds: [new NoPermissionEmbd()], ephemeral: true}).then();
             return;
         }
@@ -72,6 +85,7 @@ export class CooldownCmd extends Command {
             i.reply({embeds: [new InvalidTimeArgumentEmbd()], ephemeral: true}).then();
             return;
         }
+        
 
         //get the time in milliseconds
         const issuedTimeMs = Date.now();
@@ -131,7 +145,7 @@ export class CooldownCmd extends Command {
         //add the cooldown
         bot.addCooldown(cooldownInfo, i.guild!.id).then((outcome) => {
             if (outcome == cooldownOutcome.SUCCESS) {
-                i.reply({embeds: [new CdSuccessEmbd(user.id, (reason.value as string), time)]}).then();
+                i.reply({content: `<@${user.id}>`, embeds: [new CdSuccessEmbd(user.id, (reason.value as string), time)]}).then();
             }
             else {
                 i.reply(

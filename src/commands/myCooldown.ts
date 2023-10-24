@@ -5,6 +5,7 @@ import {Bot} from "../main";
 export class MyCooldownCmd extends Command {
     public name = "my_cooldown";
     public description = "gets your cooldown info";
+    public inDev = true;
 
     constructor() {
         super();
@@ -20,8 +21,9 @@ export class MyCooldownCmd extends Command {
             return;
         }
 
-        //const endingTime = new Date(cooldown.expiresAt);
+       const endingDate = new Date(cooldown.expiresAt);
+       
+       console.log(endingDate.toLocaleString())
 
-        //await i.reply({content: `You have been cooled down for ${cooldown.reason} for ${time}`, ephemeral: true});
     }
 }

@@ -4,17 +4,22 @@ import {cooldownOutcome} from "../interfaces";
 export class CdSuccessEmbd extends EmbedBuilder {
     constructor(userId: string, reason: string, time: string) {
         super();
-        this.setTitle("***COOLDOWN***");
+        this.setTitle("***PICKUP COOLDOWN***");
 
         //make time a clean string
-        time = time.replace("h", " hours");
-        time = time.replace("d", " days");
-        time = time.replace("w", " weeks");
-        time = time.replace("m", " months");
+        time = time.replace("h", " Hours");
+        time = time.replace("d", " Days");
+        time = time.replace("w", " Weeks");
+        time = time.replace("m", " Months");
+
+        //make first letter of reason captial
+        reason = reason.charAt(0).toUpperCase() + reason.slice(1);
+
+        this.setDescription(`<@${userId}> has been given a cooldown.`)
 
         this.addFields(
-            {name: `<@${userId}> has been cooled down for`, value: `${reason}`},
-            {name: "Duration:", value: time}
+            {name: "Reason:", value: reason, inline: true},
+            {name: `Duration`, value: `${time}`, inline: true},
         )
         this.setColor("#0f212c");
     }

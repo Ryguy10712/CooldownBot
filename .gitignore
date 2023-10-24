@@ -5,3 +5,5 @@ dist
 /cooldownbot-linux
 /cooldownbot-win-x86.exe
 /cooldownbot-linux-x86
+.vscode
+db/cooldowns.json
