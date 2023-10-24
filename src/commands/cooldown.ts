@@ -1,12 +1,13 @@
 import {Command} from "../command";
 import {CommandInteraction} from "discord.js";
-import {cooldownInfo} from "../interfaces";
+import {cooldownInfo, cooldownOutcome} from "../interfaces";
 import {Bot} from "../main";
 import {CooldownReasonModal} from "../components/CooldownReasonModal";
+import {CdFailureEmbd, CdSuccessEmbd, InvalidTimeArgumentEmbd, NoPermissionEmbd} from "../components/CooldownResponses";
 
 export class CooldownCmd extends Command {
     public name = "cooldown";
-    public description = "cool down a specified user";
+    public description = "cool down a specified user, or update an existing cooldown";
     public inDev = true;
 
     constructor() {
@@ -48,9 +49,27 @@ export class CooldownCmd extends Command {
         const time = i.options.get("time", true).value as string
         const reason = i.options.get("reason", true);
 
+        //make sure user did not try to cooldown bot
+        if(user.bot){
+            i.reply(`This idiot <@${i.user.id}> just tried to cooldown a bot 🤣🤣🤣`).then();
+            return;
+        }
+        
+        //make sure user is admin
+        if(!bot.adminIds.includes(i.user.id)){
+            i.reply({embeds: [new NoPermissionEmbd()], ephemeral: true}).then();
+            return;
+        }
+
+        //make sure time has no spaces
+        if (time.includes(" ")) {
+            i.reply({embeds: [new InvalidTimeArgumentEmbd()], ephemeral: true}).then();
+            return;
+        }
+
         //make sure the time ends with a valid suffix
         if (!time.endsWith("h") && !time.endsWith("d") && !time.endsWith("w") && !time.endsWith("m")) {
-            i.reply("Invalid time argument. Must end with h, d, w, or m").then();
+            i.reply({embeds: [new InvalidTimeArgumentEmbd()], ephemeral: true}).then();
             return;
         }
 
@@ -83,15 +102,16 @@ export class CooldownCmd extends Command {
                     userId: user.id,
                     issuedAt: issuedTimeMs,
                     expiresAt: durationMs,
+                    guildId: i.guild!.id,
                 }
 
                 //add the cooldown
-                const success = await bot.addCooldown(cooldownInfo, i.guild!.id);
-                if(success){
-                    modalInteraction.reply(`Successfully added cooldown for ${user.username}#${user.discriminator} for ${time} for reason ${reason}`).then();
+                const outcome = await bot.addCooldown(cooldownInfo, i.guild!.id);
+                if(cooldownOutcome.SUCCESS == outcome){
+                    modalInteraction.reply({content: `<@${user.id}>`, embeds: [new CdSuccessEmbd(user.id, reason, time)]}).then();
                 }
                 else {
-                    modalInteraction.reply("Failed to add cooldown").then();
+                    modalInteraction.reply({embeds: [new CdFailureEmbd(outcome)], ephemeral: true}).then();
                 }
                 return;
                 //end of modal workflow
@@ -105,15 +125,18 @@ export class CooldownCmd extends Command {
             userId: user.id,
             issuedAt: issuedTimeMs,
             expiresAt: durationMs,
+            guildId: i.guild!.id,
         }
 
         //add the cooldown
-        bot.addCooldown(cooldownInfo, i.guild!.id).then((success) => {
-            if (success) {
-                i.reply(`Successfully added cooldown for ${user.username}#${user.discriminator} for ${time} for reason ${reason.value}`).then();
+        bot.addCooldown(cooldownInfo, i.guild!.id).then((outcome) => {
+            if (outcome == cooldownOutcome.SUCCESS) {
+                i.reply({embeds: [new CdSuccessEmbd(user.id, (reason.value as string), time)]}).then();
             }
             else {
-                i.reply("Failed to add cooldown").then();
+                i.reply(
+                    {embeds: [new CdFailureEmbd(outcome)], ephemeral: true}
+                ).then();
             }
         })
 

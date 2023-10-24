@@ -1,6 +1,7 @@
 import {Command} from "../command";
 import {Bot} from "../main";
 import {CommandInteraction} from "discord.js";
+import {cooldownOutcome} from "../interfaces";
 
 export class RemoveCooldownCmd extends Command{
     public name = "remove_cooldown";
@@ -30,9 +31,9 @@ export class RemoveCooldownCmd extends Command{
             return;
         }
 
-        const success: boolean = await bot.removeCooldown(user.id);
+        const outcome: cooldownOutcome = await bot.removeCooldown(user.id, i.guild!.id);
 
-        if(!success){
+        if(outcome != cooldownOutcome.SUCCESS){
             await i.reply({content: "There was an error removing the cooldown", ephemeral: true});
             return;
         }
