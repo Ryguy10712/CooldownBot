@@ -9,6 +9,6 @@ export interface cooldownInfo {
 export enum cooldownOutcome {
     SUCCESS,
     USER_NOT_FOUND,
-    ADD_ROLE_FAILED,
+    EDIT_ROLES_FAILED,
     FAILED_TO_WRITE
 }

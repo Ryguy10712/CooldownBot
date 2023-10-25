@@ -60,3 +60,12 @@ export class RemoveCooldownSuccessEmbd extends EmbedBuilder {
         this.addFields({name: "Success:", value: `<@${userId}>'s cooldown has been removed`});
     }
 }
+
+export class NoCooldownEmbd extends EmbedBuilder {
+    constructor() {
+        super()
+        this.setTitle("Whups...")
+        this.setColor("Red");
+        this.addFields({name: "Failed:", value: "This user does not have a cooldown"});
+    }
+}

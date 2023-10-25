@@ -1,5 +1,5 @@
 import {Command} from "../command";
-import {CommandInteraction, Guild, GuildMember} from "discord.js";
+import {CommandInteraction} from "discord.js";
 import {cooldownInfo, cooldownOutcome} from "../interfaces";
 import {Bot} from "../main";
 import {CooldownReasonModal} from "../components/CooldownReasonModal";
@@ -8,7 +8,7 @@ import {CdFailureEmbd, CdSuccessEmbd, InvalidTimeArgumentEmbd, NoPermissionEmbd}
 export class CooldownCmd extends Command {
     public name = "cooldown";
     public description = "cool down a specified user, or update an existing cooldown";
-    public inDev = true;
+    public inDev = false;
 
     constructor() {
         super();

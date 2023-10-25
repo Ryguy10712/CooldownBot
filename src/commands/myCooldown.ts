@@ -1,11 +1,12 @@
 import {Command} from "../command";
 import {CommandInteraction} from "discord.js";
 import {Bot} from "../main";
+import {CooldownInfo, NoCooldown} from "../components/MyCooldownResponses";
 
 export class MyCooldownCmd extends Command {
     public name = "my_cooldown";
     public description = "gets your cooldown info";
-    public inDev = true;
+    public inDev = false;
 
     constructor() {
         super();
@@ -17,13 +18,12 @@ export class MyCooldownCmd extends Command {
         const cooldown = bot.getUserCooldown(i.user.id)
 
         if (!cooldown) {
-            await i.reply({content: "You do not have a cooldown", ephemeral: true});
+            await i.reply({embeds: [new NoCooldown()], ephemeral: false});
             return;
         }
-
-       const endingDate = new Date(cooldown.expiresAt);
        
-       console.log(endingDate.toLocaleString())
+       i.reply({embeds: [new CooldownInfo(cooldown.expiresAt)]});
+
 
     }
 }

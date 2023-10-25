@@ -77,10 +77,10 @@ export class Bot {
         }
 
         //deploy global commands
-        if(cmdBody.length){
+        if(cmdBody.length != 0){
             try {
                 await rest.put(
-                    `/applications/${process.env.CLIENT_ID}/commands`,
+                    `/applications/${this.client.application!.id}/commands`,
                     {body: cmdBody, headers: auth}
                 )
                 console.log("Successfully registered global commands.")
@@ -89,10 +89,11 @@ export class Bot {
                 console.error(error)
             }
         }
-        else
+        else {
             console.log("No global commands to deploy.")
+        }
 
-        if(inDevBody.length && process.env.DEV_GUILD_ID){
+        if(inDevBody.length != 0 && process.env.DEV_GUILD_ID){
             //deploy dev commands
             try {
                 await rest.put(
@@ -105,8 +106,9 @@ export class Bot {
                 console.error(error)
             }
         }
-        else
-            console.log("No dev commands to deploy.")
+        else {
+            console.log("No dev commands to deploy, or no dev guild specified in .env.")
+        }
 
     }
 
@@ -124,13 +126,13 @@ export class Bot {
     }
 
     public async addCooldown(cooldown: cooldownInfo, guildId: string): Promise<cooldownOutcome> {
-
+        this.cooldowns[cooldown.userId] = cooldown;
         try {
             await fs.writeFile("./db/cooldowns.json", JSON.stringify(this.cooldowns));
         } catch (e) {
             return cooldownOutcome.FAILED_TO_WRITE;
         }
-        this.cooldowns[cooldown.userId] = cooldown;
+
 
         const guild = await this.client.guilds.fetch(guildId)
         let user: GuildMember
@@ -154,7 +156,7 @@ export class Bot {
             await user.roles.add(role);
         }
         catch (e) {
-            return cooldownOutcome.ADD_ROLE_FAILED;
+            return cooldownOutcome.EDIT_ROLES_FAILED;
         }
 
         return cooldownOutcome.SUCCESS
@@ -185,7 +187,7 @@ export class Bot {
             await user.roles.remove(process.env.COOLDOWN_ROLE_ID!);
         }
         catch (e) {
-            return cooldownOutcome.ADD_ROLE_FAILED
+            return cooldownOutcome.EDIT_ROLES_FAILED
         }
         return cooldownOutcome.SUCCESS
 
