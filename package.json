@@ -4,15 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsc -p ./tsconfig.json --watch",
     "start": "node ./build/main.js",
-    "build": "tsc -p ./tsconfig.json"
+    "build": "tsc -p ./tsconfig.json",
+    "package": "pkg ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bin": "./build/main.js",
   "dependencies": {
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1"
+  },
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "targets": [ "node16-linux-x64", "node16-win-x64"]
   }
 }
