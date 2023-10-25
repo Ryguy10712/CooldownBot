@@ -9,7 +9,7 @@ export class interactionCreateListener extends eventListener{
         bot.client.on(this.eventName, async (interaction: Interaction) => {
             if (!interaction.isCommand()) return;
 
-            if(!interaction.guild || interaction.guild.id != "932118788952948756") {
+            if(!interaction.guild || interaction.guild.id != "873386946792136704") {
                 interaction.reply("This bot is only for use within PCL");
                 return;
             }
