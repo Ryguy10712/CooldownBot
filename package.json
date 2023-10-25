@@ -7,7 +7,8 @@
     "dev": "tsc -p ./tsconfig.json --watch",
     "start": "node ./build/main.js",
     "build": "tsc -p ./tsconfig.json",
-    "package": "pkg ."
+    "package": "pkg .",
+    "build_all" : "tsc -p ./tsconfig.json && pkg ."
   },
   "keywords": [],
   "author": "",
